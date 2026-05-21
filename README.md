@@ -80,7 +80,7 @@ Safest rule:
 
 ### Wiring image
 
-![ESP32-S3 Super Mini to NEO-7 wiring](assets/esp32s3-supermini-neo7-wiring.svg)
+ESP32-S3 Super Mini to NEO-7 wiring
 
 The image shows the same mapping used by the sketch:
 
