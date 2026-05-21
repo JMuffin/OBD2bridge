@@ -78,17 +78,6 @@ Safest rule:
 - if your NEO-7 module supports `3.3V` power, use `3V3`,
 - if your module is labeled for `5V` input, confirm its logic level behavior before wiring.
 
-### Wiring image
-
-ESP32-S3 Super Mini to NEO-7 wiring
-
-The image shows the same mapping used by the sketch:
-
-- `GPS TX -> ESP GPIO5`
-- `ESP GPIO6 -> GPS RX` optional
-- `GND -> GND`
-- `VCC -> 3V3` or the module's supported power input
-
 ### Minimal GPS wiring
 
 If you only want standard location reading, you can usually connect just:
