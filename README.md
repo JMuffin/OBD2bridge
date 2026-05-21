@@ -88,6 +88,40 @@ If you only want standard location reading, you can usually connect just:
 
 The `GPS RX -> ESP GPIO6` line is optional for this sketch.
 
+## Arduino IDE libraries
+
+To compile this sketch in Arduino IDE, install the `ESP32 by Espressif Systems` board package from Boards Manager.
+
+Tested local environment:
+
+- `ESP32 by Espressif Systems` version `3.3.8`
+
+The following libraries are required from Library Manager:
+
+| Library Manager name | Tested version | Used for |
+|---|---|---|
+| `NimBLE-Arduino` | `2.5.0` | BLE connection to the OBD adapter |
+| `TinyGPSPlus` | `1.0.3` | NMEA GPS parsing |
+| `ArduinoJson` | `7.4.3` | webhook payload and internal JSON handling |
+
+The following headers come from the `ESP32` core itself and do not need a separate Library Manager install:
+
+- `WiFi.h`
+- `WiFiClient.h`
+- `WiFiClientSecure.h`
+- `HTTPClient.h`
+- `Preferences.h`
+- `WebServer.h`
+- `DNSServer.h`
+
+Quick install path in Arduino IDE:
+
+1. Open `Boards Manager` and install `ESP32 by Espressif Systems`.
+2. Open `Library Manager`.
+3. Install `NimBLE-Arduino`.
+4. Install `TinyGPSPlus`.
+5. Install `ArduinoJson`.
+
 ## Flash / board settings
 
 Recommended Arduino IDE settings:
