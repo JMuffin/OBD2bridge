@@ -104,24 +104,6 @@ The following libraries are required from Library Manager:
 | `TinyGPSPlus` | `1.0.3` | NMEA GPS parsing |
 | `ArduinoJson` | `7.4.3` | webhook payload and internal JSON handling |
 
-The following headers come from the `ESP32` core itself and do not need a separate Library Manager install:
-
-- `WiFi.h`
-- `WiFiClient.h`
-- `WiFiClientSecure.h`
-- `HTTPClient.h`
-- `Preferences.h`
-- `WebServer.h`
-- `DNSServer.h`
-
-Quick install path in Arduino IDE:
-
-1. Open `Boards Manager` and install `ESP32 by Espressif Systems`.
-2. Open `Library Manager`.
-3. Install `NimBLE-Arduino`.
-4. Install `TinyGPSPlus`.
-5. Install `ArduinoJson`.
-
 ## Flash / board settings
 
 Recommended Arduino IDE settings:
@@ -130,10 +112,6 @@ Recommended Arduino IDE settings:
 - Flash size: `4MB`
 - Partition scheme: `Huge APP (3MB No OTA / 1MB SPIFFS)`
 
-This sketch was validated with:
-
-- `esp32:esp32:esp32s3`
-- `PartitionScheme=huge_app`
 
 ## First boot and setup portal
 
@@ -239,13 +217,11 @@ When disabled:
 #### BLE address
 
 MAC address of the BLE OBD adapter.
-
 You can type it manually or use the BLE scan results from the portal.
 
 #### BLE display name
 
 Human-readable label for the selected BLE device.
-
 This is informational only and helps identify the adapter in the portal.
 
 #### Webhook URL
@@ -266,16 +242,15 @@ Authorization: Bearer <token>
 ```
 
 If left empty, the request is sent without the `Authorization` header.
+To obtain your unique bearer token, you need to create a long-lasting token in your Home Assistant account settings.
 
 ## Built-in PIDs
 
 Built-in PIDs are fixed in code and shown in the portal as defaults.
 
 You can:
-
 - enable them,
 - disable them.
-
 You cannot edit their parser, formula or command from the portal.
 
 ### Built-in PID list
@@ -440,7 +415,6 @@ Examples:
 - `7E2`
 
 Use this when:
-
 - a PID belongs to another ECU,
 - the default header is not the correct request target.
 
@@ -456,7 +430,6 @@ Example:
 If this field is left empty, the sketch derives it automatically from the request header by adding `8` in the usual OBD style.
 
 Use this field when:
-
 - the responding ECU does not follow the default `request + 8` pattern,
 - you want to force the parser to accept only a specific response CAN ID.
 
@@ -493,7 +466,6 @@ Examples:
 Best for most numeric PIDs.
 
 The sketch:
-
 - removes transport framing,
 - removes the positive response prefix,
 - exposes remaining data bytes as `A..H`,
@@ -521,7 +493,6 @@ This parser expects multi-frame VIN data and rebuilds the 17-character VIN.
 Special parser for adapter voltage response.
 
 Use with:
-
 - service `AT`
 - pid `RV`
 
@@ -532,7 +503,6 @@ This parser is different from normal OBD frame parsing and reads the adapter's t
 Converts response bytes after the positive response prefix into readable ASCII text.
 
 Use when:
-
 - the ECU returns printable text,
 - raw numeric formulas are not suitable.
 
@@ -541,7 +511,6 @@ Use when:
 Interprets the data bytes after the positive response prefix as one big unsigned integer.
 
 Useful for:
-
 - counters,
 - identifiers,
 - raw numeric values when you do not want to write a formula.
@@ -551,7 +520,6 @@ Useful for:
 Returns the remaining response bytes as a hex string.
 
 This is very useful for:
-
 - reverse engineering new PIDs,
 - comparing responses with Car Scanner,
 - checking multi-frame payload structure before building a formula.
@@ -676,16 +644,34 @@ Example:
 template:
   sensor:
     - name: "Audi car proxy"
-      state: "{{ states('sensor.audi_car') }}"
+      state: >
+          {% set s = states('sensor.audi_car') %}
+          {{ s if s not in ['unknown', 'unavailable', 'none', ''] else this.state
       attributes:
-        odometer: "{{ state_attr('sensor.audi_car', 'odometer') | float(0) }}"
-        fuel_level: "{{ state_attr('sensor.audi_car', 'fuel_level') | float(0) }}"
-        latitude: "{{ state_attr('sensor.audi_car', 'latitude') | float(0) }}"
-        longitude: "{{ state_attr('sensor.audi_car', 'longitude') | float(0) }}"
-        speed: "{{ state_attr('sensor.audi_car', 'speed') | float(0) }}"
-        ecu_voltage: "{{ state_attr('sensor.audi_car', 'ecu_voltage') | float(0) }}"
-        engine_runtime_min: "{{ state_attr('sensor.audi_car', 'engine_runtime_min') | float(0) }}"
-        fuel_liters: "{{ states('sensor.obd2bridge_fuel_liters') | float(0) }}"
+        odometer: >
+            {% set v = state_attr('sensor.audi_car','odometer') %}
+            {{ v if v is not none else this.attributes.odometer | default(0) }}
+          fuel_level: >
+            {% set v = state_attr('sensor.audi_car','fuel_level') %}
+            {{ v if v is not none else this.attributes.fuel_level | default(0) }}
+          latitude: >
+            {% set v = state_attr('sensor.audi_car','latitude') %}
+            {{ v if v is not none else this.attributes.latitude | default(0) }}
+          longitude: >
+            {% set v = state_attr('sensor.audi_car','longitude') %}
+            {{ v if v is not none else this.attributes.longitude | default(0) }}
+          speed: >
+            {% set v = state_attr('sensor.audi_car','speed') %}
+            {{ v if v is not none else this.attributes.speed | default(0) }}
+          ecu_voltage: >
+            {% set v = state_attr('sensor.audi_car','ecu_voltage') %}
+            {{ v if v is not none else this.attributes.ecu_voltage | default(0) }}
+          engine_runtime_min: >
+            {% set v = state_attr('sensor.audi_car','engine_runtime_min') %}
+            {{ v if v is not none else this.attributes.engine_runtime_min | default(0) }}
+          fuel_liters: >
+            {% set v = states('sensor.obd2bridge_fuel_liters') %}
+            {{ v if v not in ['unknown', 'unavailable', 'none', ''] else this.attributes.fuel_liters | default(0) }}
 ```
 
 ### Adapting the Home Assistant template
@@ -711,7 +697,6 @@ then the HA proxy can expose it like this:
 ```
 
 This proxy pattern is especially handy when:
-
 - you want one friendly entity for Lovelace,
 - you want to keep selected attributes grouped together,
 - you prefer referencing a stable helper sensor in automations instead of reading many raw webhook attributes directly.
@@ -761,11 +746,6 @@ Recommended reverse-engineering workflow:
 - the setup AP password is fixed in the sketch source
 - HTTPS webhook mode currently uses `setInsecure()`
 
-If you want stronger security, the next step would be:
-
-- custom AP password configuration,
-- certificate validation instead of insecure HTTPS,
-- optional auth on the setup portal.
 
 ## Troubleshooting
 
@@ -799,14 +779,5 @@ If you want stronger security, the next step would be:
 
 ## Build status
 
-This sketch was compiled successfully for:
-
-- `ESP32-S3`
-- `Huge APP (3MB app + 1MB SPIFFS)`
-
-Typical result at the time of writing:
-
-- program storage: about `1.31 MB`
-- RAM usage: about `54 KB`
-
-That leaves comfortable headroom on `Huge APP`.
+This sketch was tested on Audi A3 8V 2018 and Audi Q2 2019 with vGate iCar Pro 2S BLE Scanner.
+If it works for you with different ELM327 BLE scanner please let me know so I can start creating compatibility list.
