@@ -19,6 +19,10 @@ This project is designed for:
 - `NEO-7` GPS modules
 - `ESP32 4MB flash` with `Huge APP (3MB app + 1MB SPIFFS)`
 
+Why Webhook over MQTT or other methods?
+There is a problem with MQTT when access to HA is through Cloudflare Tunnel or bonded to a domain.
+Webhook solves that issue using an access token.
+
 ## Features
 
 - BLE connection to OBD adapter
