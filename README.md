@@ -644,34 +644,38 @@ Example:
 template:
   sensor:
     - name: "Audi car proxy"
-      state: >
+      state: >-
           {% set s = states('sensor.audi_car') %}
-          {{ s if s not in ['unknown', 'unavailable', 'none', ''] else this.state
-      attributes:
-        odometer: >
-            {% set v = state_attr('sensor.audi_car','odometer') %}
-            {{ v if v is not none else this.attributes.odometer | default(0) }}
+          {% if s not in ['unknown', 'unavailable', 'none', ''] %}
+            {{ s }}
+          {% else %}
+            {{ this.state if this.state is defined else 'unknown' }}
+          {% endif %}
+        attributes:
+          odometer: >
+            {% set v = state_attr('sensor.audi_car', 'odometer') %}
+            {{ v if v is not none else this.attributes.get('odometer', 0) }}
           fuel_level: >
-            {% set v = state_attr('sensor.audi_car','fuel_level') %}
-            {{ v if v is not none else this.attributes.fuel_level | default(0) }}
+            {% set v = state_attr('sensor.audi_car', 'fuel_level') %}
+            {{ v if v is not none else this.attributes.get('fuel_level', 0) }}
           latitude: >
-            {% set v = state_attr('sensor.audi_car','latitude') %}
-            {{ v if v is not none else this.attributes.latitude | default(0) }}
+            {% set v = state_attr('sensor.audi_car', 'latitude') %}
+            {{ v if v is not none else this.attributes.get('latitude', 0) }}
           longitude: >
-            {% set v = state_attr('sensor.audi_car','longitude') %}
-            {{ v if v is not none else this.attributes.longitude | default(0) }}
+            {% set v = state_attr('sensor.audi_car', 'longitude') %}
+            {{ v if v is not none else this.attributes.get('longitude', 0) }}
           speed: >
-            {% set v = state_attr('sensor.audi_car','speed') %}
-            {{ v if v is not none else this.attributes.speed | default(0) }}
+            {% set v = state_attr('sensor.audi_car', 'speed') %}
+            {{ v if v is not none else this.attributes.get('speed', 0) }}
           ecu_voltage: >
-            {% set v = state_attr('sensor.audi_car','ecu_voltage') %}
-            {{ v if v is not none else this.attributes.ecu_voltage | default(0) }}
+            {% set v = state_attr('sensor.audi_car', 'ecu_voltage') %}
+            {{ v if v is not none else this.attributes.get('ecu_voltage', 0) }}
           engine_runtime_min: >
-            {% set v = state_attr('sensor.audi_car','engine_runtime_min') %}
-            {{ v if v is not none else this.attributes.engine_runtime_min | default(0) }}
+            {% set v = state_attr('sensor.audi_car', 'engine_runtime_min') %}
+            {{ v if v is not none else this.attributes.get('engine_runtime_min', 0) }}
           fuel_liters: >
             {% set v = states('sensor.obd2bridge_fuel_liters') %}
-            {{ v if v not in ['unknown', 'unavailable', 'none', ''] else this.attributes.fuel_liters | default(0) }}
+            {{ v if v not in ['unknown', 'unavailable', 'none', ''] else this.attributes.get('fuel_liters', 0) }}
 ```
 
 ### Adapting the Home Assistant template
